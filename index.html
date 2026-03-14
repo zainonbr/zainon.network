@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>// ZAINON // SYS://NIGHT_CITY</title>
+    
+    <!-- Fontes e Pré-conexões -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== RESET E VARIÁVEIS ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Variáveis de tema */
+        :root {
+            --primary: #00f7ff;
+            --secondary: #ff00d0;
+            --tertiary: #7700ff;
+            --accent: #00ff9d;
+            
+            --bg-deep: #030014;
+            --bg-overlay: rgba(2, 0, 20, 0.85);
+            --bg-card: rgba(5, 0, 30, 0.7);
+            
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff00aa;
+            --neon-green: #00ffaa;
+            --neon-purple: #aa00ff;
+            
+            --grid-color: rgba(0, 247, 255, 0.1);
+            --scanline: rgba(0, 255, 255, 0.03);
+            
+            --glow-intensity: 0 0 20px;
+            --text-shadow: 0 0 10px currentColor;
+            
+            --safe-zone: clamp(16px, 4vw, 24px);
+            
+            /* Cores dinâmicas */
+            --dynamic-hue: 180;
+            --dynamic-primary: hsl(var(--dynamic-hue), 100%, 50%);
+            --dynamic-secondary: hsl(calc(var(--dynamic-hue) + 60), 100%, 50%);
+        }
+
+        /* ========== ANIMAÇÕES ========== */
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; filter: blur(2px); }
+            50% { opacity: 1; filter: blur(4px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            33% { transform: translateY(-20px) translateX(10px) rotate(2deg); }
+            66% { transform: translateY(10px) translateX(-20px) rotate(-2deg); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+            50% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor; }
+        }
+
+        /* ========== TERMINAL STYLE MACOS ========== */
+        .terminal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', 'Share Tech Mono', monospace;
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .terminal-overlay.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .terminal-window {
+            width: 80%;
+            max-width: 800px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3), 0 0 0 2px #00f0ff;
+            overflow: hidden;
+            animation: terminalGlow 2s infinite alternate;
+        }
+
+        @keyframes terminalGlow {
+            0% { box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3), 0 0 0 2px #00f0ff; }
+            100% { box-shadow: 0 20px 80px rgba(255, 0, 170, 0.4), 0 0 0 3px #ff00aa; }
+        }
+
+        .terminal-header {
+            background: #2d2d2d;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #00f0ff;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-title {
+            color: #00f0ff;
+            font-size: 14px;
+            margin-left: 10px;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .terminal-content {
+            padding: 25px;
+            min-height: 300px;
+            background: #1a1a1a;
+            color: #00ffaa;
+            font-size: 16px;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(0, 255, 170, 0.5);
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: terminalType 0.1s forwards;
+        }
+
+        .terminal-line .prompt {
+            color: #00f0ff;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .terminal-line .command {
+            color: #ffffff;
+        }
+
+        .terminal-line .output {
+            color: #ff00aa;
+            margin-left: 20px;
+            font-style: italic;
+        }
+
+        .terminal-line .success {
+            color: #00ffaa;
+            font-weight: bold;
+            animation: blink 0.5s infinite;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ffaa;
+            animation: cursorBlink 1s infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes terminalType {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== ESTRUTURA BASE ========== */
+        body {
+            font-family: 'Chakra Petch', 'Share Tech Mono', monospace;
+            background: var(--bg-deep);
+            color: var(--primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            animation: flicker 8s infinite;
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+
+        /* ========== CANVAS 3D ========== */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(1px) brightness(1.2);
+            transform: translateZ(-50px) scale(1.1);
+        }
+
+        /* ========== EFEITOS DE CAMADA ========== */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                var(--scanline) 2px,
+                var(--scanline) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.4;
+            mix-blend-mode: overlay;
+            transform: translateZ(10px);
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0.3;
+            transform: translateZ(5px) rotateX(2deg);
+        }
+
+        /* ========== PARTÍCULAS ========== */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            opacity: 0;
+            animation: particleFloat 4s infinite;
+            transform: translateZ(calc(var(--z) * 1px));
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(0) translateZ(calc(var(--z) * 1px)) scale(1);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateZ(calc(var(--z) * 1px)) scale(0);
+            }
+        }
+
+        /* ========== OUTDOOR DIGITAL ========== */
+        .digital-billboard {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            height: 150px;
+            z-index: 20;
+            transform-style: preserve-3d;
+            transform: translateZ(50px) rotateY(-10deg) rotateX(5deg);
+            animation: billboardFloat 6s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes billboardFloat {
+            0%, 100% { transform: translateZ(50px) rotateY(-10deg) rotateX(5deg) translateY(0); }
+            50% { transform: translateZ(60px) rotateY(-8deg) rotateX(7deg) translateY(-10px); }
+        }
+
+        .billboard-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid var(--neon-blue);
+            box-shadow: 
+                0 0 30px var(--neon-blue),
+                0 0 60px var(--neon-pink),
+                inset 0 0 20px rgba(0, 247, 255, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            transform-style: preserve-3d;
+        }
+
+        .billboard-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: linear-gradient(135deg, 
+                rgba(0, 247, 255, 0.1) 0%, 
+                rgba(255, 0, 170, 0.1) 100%);
+            animation: billboardGlow 2s infinite;
+        }
+
+        @keyframes billboardGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .billboard-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--neon-blue);
+            text-stroke: 2px var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            animation: neonFlicker 3s infinite;
+            text-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-pink);
+            position: relative;
+        }
+
+        .billboard-sub {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 14px;
+            margin-top: 5px;
+            letter-spacing: 4px;
+            animation: glowPulse 2s infinite;
+        }
+
+        .sparks-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .spark {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffff00;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ffff00, 0 0 30px #ffaa00;
+            animation: sparkFly 1.5s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes sparkFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* ========== CIDADE DIGITAL ========== */
+        .digital-city {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40vh;
+            z-index: 0;
+            perspective: 500px;
+            transform-style: preserve-3d;
+            mask-image: linear-gradient(to top, black 70%, transparent);
+        }
+
+        .building-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            transform: rotateX(10deg) translateZ(-20px);
+            transform-origin: bottom;
+            transform-style: preserve-3d;
+        }
+
+        .building {
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(180deg, 
+                transparent 0%,
+                var(--neon-blue) 20%,
+                var(--neon-purple) 80%,
+                transparent 100%
+            );
+            opacity: 0.15;
+            filter: blur(2px);
+            animation: buildingGlow 3s infinite alternate;
+            box-shadow: 0 -10px 20px var(--neon-blue);
+            transform: translateZ(calc(var(--z-depth) * 1px));
+            transition: transform 0.5s ease, opacity 0.3s ease;
+        }
+
+        .building:nth-child(2n) {
+            height: 200px;
+            background: linear-gradient(180deg, 
+                transparent 0%,
+                var(--neon-pink) 20%,
+                var(--neon-blue) 80%,
+                transparent 100%
+            );
+            animation-delay: -1s;
+        }
+
+        .building:nth-child(3n) {
+            height: 150px;
+            background: linear-gradient(180deg, 
+                transparent 0%,
+                var(--neon-green) 20%,
+                var(--neon-purple) 80%,
+                transparent 100%
+            );
+            animation-delay: -2s;
+        }
+
+        .building:hover {
+            opacity: 0.4;
+            transform: translateZ(30px) scale(1.1);
+            filter: blur(1px);
+        }
+
+        @keyframes buildingGlow {
+            0% {
+                opacity: 0.1;
+                filter: blur(3px);
+            }
+            100% {
+                opacity: 0.3;
+                filter: blur(1px);
+                box-shadow: 0 -20px 40px currentColor;
+            }
+        }
+
+        /* ========== SVG DECORATIVOS ========== */
+        .svg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            transform-style: preserve-3d;
+        }
+
+        .decor-svg {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 20px var(--neon-blue));
+            animation: svgFloat 10s infinite ease-in-out;
+        }
+
+        .decor-svg svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--neon-blue);
+            stroke-width: 2;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 3s forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .decor-svg-1 {
+            top: 10%;
+            left: 5%;
+            transform: rotate(15deg) translateZ(-30px);
+        }
+
+        .decor-svg-2 {
+            bottom: 15%;
+            right: 5%;
+            width: 300px;
+            height: 300px;
+            transform: rotate(-10deg) translateZ(20px);
+        }
+
+        .decor-svg-3 {
+            top: 20%;
+            right: 15%;
+            width: 150px;
+            height: 150px;
+            transform: rotate(45deg) translateZ(10px);
+        }
+
+        @keyframes svgFloat {
+            0%, 100% { transform: translateY(0) rotate(var(--rotate, 0deg)); }
+            50% { transform: translateY(-20px) rotate(var(--rotate, 0deg)); }
+        }
+
+        /* ========== CARD PRINCIPAL ========== */
+        .card {
+            position: relative;
+            z-index: 10;
+            
+            background: var(--bg-card);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            
+            padding: calc(var(--safe-zone) * 2);
+            
+            border: 2px solid transparent;
+            border-image: linear-gradient(
+                45deg,
+                var(--neon-blue),
+                var(--neon-pink),
+                var(--neon-purple),
+                var(--neon-green)
+            );
+            border-image-slice: 1;
+            
+            box-shadow: 
+                0 0 30px var(--neon-blue),
+                0 0 60px var(--neon-pink),
+                inset 0 0 30px rgba(0, 247, 255, 0.2);
+            
+            max-width: min(600px, 90vw);
+            width: 100%;
+            
+            transform-style: preserve-3d;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            
+            opacity: 1;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg,
+                var(--neon-blue),
+                var(--neon-pink),
+                var(--neon-purple),
+                var(--neon-green)
+            );
+            filter: blur(20px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: pulse 4s infinite;
+            transform: translateZ(-10px);
+        }
+
+        .card::after {
+            content: '>_ ZAINON.CORE // v2.0.6';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            
+            background: var(--bg-deep);
+            color: var(--neon-green);
+            
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            
+            padding: 4px 12px;
+            
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            
+            letter-spacing: 2px;
+            white-space: nowrap;
+            transform: translateZ(5px);
+        }
+
+        @media (max-width: 480px) {
+            .card::after {
+                font-size: 8px;
+                top: -8px;
+                padding: 2px 8px;
+            }
+        }
+
+        /* ========== NOME GLITCH ========== */
+        .glitch-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(24px, 8vw, 48px);
+            margin-bottom: 20px;
+            text-align: center;
+            
+            color: white;
+            text-shadow: 
+                0.05em 0 0 var(--neon-pink),
+                -0.05em -0.025em 0 var(--neon-blue),
+                0.025em 0.05em 0 var(--neon-green);
+            
+            animation: glitch 500ms infinite;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .glitch-name span {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .glitch-name span:first-child {
+            animation: glitch-anim-1 0.3s infinite linear alternate;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            transform: translate(-0.025em, -0.0125em) translateZ(2px);
+            opacity: 0.8;
+            color: var(--neon-pink);
+            text-shadow: none;
+        }
+
+        .glitch-name span:last-child {
+            animation: glitch-anim-2 0.3s infinite linear alternate;
+            clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%);
+            transform: translate(0.0125em, 0.025em) translateZ(-2px);
+            opacity: 0.8;
+            color: var(--neon-blue);
+            text-shadow: none;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0) translateZ(0); }
+            20% { transform: translate(-2px, 2px) translateZ(5px); }
+            40% { transform: translate(-2px, -2px) translateZ(-5px); }
+            60% { transform: translate(2px, 2px) translateZ(5px); }
+            80% { transform: translate(2px, -2px) translateZ(-5px); }
+        }
+
+        @keyframes glitch-anim-1 {
+            0%, 100% { clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+            20% { clip-path: polygon(0 15%, 100% 15%, 100% 30%, 0 30%); }
+            40% { clip-path: polygon(0 45%, 100% 45%, 100% 50%, 0 50%); }
+            60% { clip-path: polygon(0 5%, 100% 5%, 100% 25%, 0 25%); }
+            80% { clip-path: polygon(0 30%, 100% 30%, 100% 55%, 0 55%); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 100% { clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%); }
+            20% { clip-path: polygon(0 60%, 100% 40%, 100% 90%, 0 90%); }
+            40% { clip-path: polygon(0 70%, 100% 30%, 100% 80%, 0 80%); }
+            60% { clip-path: polygon(0 85%, 100% 15%, 100% 95%, 0 95%); }
+            80% { clip-path: polygon(0 55%, 100% 45%, 100% 70%, 0 70%); }
+        }
+
+        /* ========== BIO ========== */
+        .bio {
+            color: var(--neon-green);
+            font-size: clamp(14px, 4vw, 18px);
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px currentColor;
+            border-bottom: 1px dashed var(--neon-blue);
+            padding-bottom: 15px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .bio::before {
+            content: '>';
+            position: absolute;
+            left: -15px;
+            color: var(--neon-pink);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ========== LINKS TERMINAL ========== */
+        .terminal-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .terminal-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            
+            padding: 15px 20px;
+            
+            background: rgba(0, 247, 255, 0.03);
+            border: 1px solid var(--neon-blue);
+            border-radius: 0;
+            
+            color: white;
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(14px, 3.5vw, 16px);
+            
+            position: relative;
+            overflow: hidden;
+            
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            
+            box-shadow: 0 0 10px transparent;
+            
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+        }
+
+        .terminal-link:hover {
+            transform: translateX(10px) scale(1.02) translateZ(20px);
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 170, 0.1);
+            box-shadow: 
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-blue);
+        }
+
+        .terminal-link:active {
+            transform: translateX(5px) scale(0.98) translateZ(10px);
+            transition: transform 0.1s;
+        }
+
+        .terminal-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 247, 255, 0.2),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+
+        .terminal-link:hover::before {
+            left: 100%;
+        }
+
+        .link-icon {
+            color: var(--neon-green);
+            font-size: 20px;
+            text-shadow: 0 0 10px currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        .terminal-link:hover .link-icon {
+            transform: rotate(90deg) scale(1.2);
+            color: var(--neon-pink);
+        }
+
+        .link-stats {
+            font-size: 12px;
+            color: var(--neon-purple);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-link:hover .link-stats {
+            color: var(--neon-green);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* ========== SISTEMA DE HORAS ========== */
+        .time-system {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--neon-green);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px var(--neon-blue);
+            transform: translateZ(30px);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* ========== FOOTER ========== */
+        .system-info {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--neon-blue);
+            border-top: 1px solid rgba(0, 247, 255, 0.3);
+            padding-top: 15px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status:hover {
+            color: var(--neon-pink);
+            transform: translateZ(10px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        /* ========== WATERMARK ========== */
+        .security-watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 9999;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: rgba(0, 247, 255, 0.15);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            pointer-events: none;
+            user-select: none;
+            transform: rotate(180deg) translateZ(5px);
+            letter-spacing: 2px;
+        }
+
+        /* ========== PROTEÇÕES ========== */
+        .card, .glitch-name, .bio, .terminal-link, .system-info {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* ========== RESPONSIVIDADE ========== */
+        @media (max-width: 768px) {
+            .card {
+                padding: 25px;
+                max-width: 95vw;
+            }
+
+            .terminal-link {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .glitch-name {
+                font-size: 32px;
+            }
+            
+            .digital-billboard {
+                width: 200px;
+                height: 100px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .billboard-text {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+            
+            .time-system {
+                top: 10px;
+                left: 10px;
+                font-size: 12px;
+                padding: 8px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glitch-name {
+                font-size: 24px;
+            }
+
+            .bio {
+                font-size: 12px;
+            }
+
+            .terminal-link {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .system-info {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .terminal-link:hover {
+                transform: none;
+            }
+
+            .card {
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Terminal Overlay (estilo macOS) -->
+    <div class="terminal-overlay" id="terminalOverlay">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                </div>
+                <div class="terminal-title">zainon@system:~ — zsh</div>
+            </div>
+            <div class="terminal-content" id="terminalContent">
+                <div class="terminal-line" style="animation-delay: 0.1s;">
+                    <span class="prompt">➜</span>
+                    <span class="command">~ sudo ./initialize-system</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 0.3s;">
+                    <span class="prompt">></span>
+                    <span class="output">Inicializando módulos de segurança...</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 0.6s;">
+                    <span class="prompt">></span>
+                    <span class="output">Carregando kernel ZAINON v2.0.6</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 0.9s;">
+                    <span class="prompt">></span>
+                    <span class="output">Estabelecendo conexão segura...</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 1.2s;">
+                    <span class="prompt">🔒</span>
+                    <span class="output">Criptografia RSA-4096 ativada</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 1.5s;">
+                    <span class="prompt">🌐</span>
+                    <span class="output">Conectado à rede neural</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 1.8s;">
+                    <span class="prompt">✓</span>
+                    <span class="success">ACESSO AUTORIZADO</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 2.1s;">
+                    <span class="prompt">🚀</span>
+                    <span class="output">Inicializando interface...</span>
+                </div>
+                <div class="terminal-line" style="animation-delay: 2.4s;">
+                    <span class="prompt">ZAINON@SYSTEM:~$</span>
+                    <span class="command">_<span class="cursor"></span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas 3D -->
+    <canvas id="canvas-bg"></canvas>
+    
+    <!-- Efeitos de camada -->
+    <div class="scanlines"></div>
+    <div class="grid-overlay"></div>
+    
+    <!-- Partículas -->
+    <div class="particles-container" id="particles"></div>
+    
+    <!-- Outdoor Digital -->
+    <div class="digital-billboard">
+        <div class="billboard-frame">
+            <div class="billboard-content">
+                <div class="billboard-text">ZAINON</div>
+                <div class="billboard-sub">LIVE // 24/7</div>
+                <div class="sparks-container" id="sparks"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SVGs Decorativos -->
+    <div class="svg-container">
+        <div class="decor-svg decor-svg-1">
+            <svg viewBox="0 0 100 100">
+                <path d="M10,50 Q30,30 50,50 T90,50" stroke="var(--neon-blue)" fill="none" stroke-width="2">
+                    <animate attributeName="stroke-dashoffset" values="1000;0" dur="3s" fill="freeze" />
+                </path>
+                <circle cx="50" cy="50" r="5" fill="var(--neon-pink)">
+                    <animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" />
+                </circle>
+            </svg>
+        </div>
+        <div class="decor-svg decor-svg-2">
+            <svg viewBox="0 0 100 100">
+                <rect x="20" y="20" width="60" height="60" stroke="var(--neon-green)" fill="none" stroke-width="2">
+                    <animate attributeName="stroke-dashoffset" values="1000;0" dur="3s" fill="freeze" />
+                </rect>
+                <line x1="20" y1="20" x2="80" y2="80" stroke="var(--neon-purple)" stroke-width="1">
+                    <animate attributeName="stroke-dashoffset" values="1000;0" dur="3s" fill="freeze" />
+                </line>
+                <line x1="80" y1="20" x2="20" y2="80" stroke="var(--neon-purple)" stroke-width="1">
+                    <animate attributeName="stroke-dashoffset" values="1000;0" dur="3s" fill="freeze" />
+                </line>
+            </svg>
+        </div>
+        <div class="decor-svg decor-svg-3">
+            <svg viewBox="0 0 100 100">
+                <polygon points="50,10 90,50 50,90 10,50" stroke="var(--neon-pink)" fill="none" stroke-width="2">
+                    <animate attributeName="stroke-dashoffset" values="1000;0" dur="3s" fill="freeze" />
+                </polygon>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- Cidade Digital -->
+    <div class="digital-city">
+        <div class="building-layer" id="buildingLayer"></div>
+    </div>
+    
+    <!-- Sistema de Horas -->
+    <div class="time-system" id="timeSystem">
+        SYS://LOADING...
+    </div>
+    
+    <!-- Watermark de Segurança -->
+    <div class="security-watermark">
+        ENCRYPTED // SECURE CONNECTION // ZAINON.ENC
+    </div>
+
+    <!-- Card Principal -->
+    <div class="card" id="mainCard">
+        <div class="glitch-name" data-text="ZAINON">
+            ZAINON
+            <span aria-hidden="true">ZAINON</span>
+            <span aria-hidden="true">ZAINON</span>
+        </div>
+        
+        <div class="bio">
+            quando o mundo desacelera, a live começa
+        </div>
+        
+        <div class="terminal-links">
+            <a href="https://www.sooplive.co.kr/station/777242" class="terminal-link" target="_blank" rel="noopener noreferrer" data-link="soop">
+                <span class="link-icon">></span>
+                <span>SOOPLIVE</span>
+                <span class="link-stats">[ONLINE]</span>
+            </a>
+            
+            <a href="https://www.youtube.com/@zainonbr" class="terminal-link" target="_blank" rel="noopener noreferrer" data-link="yt">
+                <span class="link-icon">></span>
+                <span>YOUTUBE</span>
+                <span class="link-stats">[SUBSCRIBE]</span>
+            </a>
+            
+            <a href="https://www.instagram.com/edu.padilha07/" class="terminal-link" target="_blank" rel="noopener noreferrer" data-link="ig">
+                <span class="link-icon">></span>
+                <span>INSTAGRAM</span>
+                <span class="link-stats">[FOLLOW]</span>
+            </a>
+            
+            <a href="https://www.tiktok.com/@zainonbr" class="terminal-link" target="_blank" rel="noopener noreferrer" data-link="tt">
+                <span class="link-icon">></span>
+                <span>TIKTOK</span>
+                <span class="link-stats">[TRENDING]</span>
+            </a>
+            
+            <a href="https://www.paypal.com/donate/?business=QCK5BKTRNPGNW" class="terminal-link" target="_blank" rel="noopener noreferrer" data-link="donate">
+                <span class="link-icon">></span>
+                <span>DONATE</span>
+                <span class="link-stats">[SUPPORT]</span>
+            </a>
+        </div>
+        
+        <div class="system-info">
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>SISTEMA://ATIVO</span>
+            </div>
+            <div class="status">
+                <span>© 2026 // ZAINON.CORE</span>
+            </div>
+            <div class="status">
+                <span>v2.0.6 // [ENCRYPTED]</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            // ========== CONFIGURAÇÕES DE SEGURANÇA ==========
+            (function securityMeasures() {
+                document.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    return false;
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (
+                        e.ctrlKey && 
+                        (e.key === 'u' || e.key === 'U' || 
+                         e.key === 's' || e.key === 'S' || 
+                         e.key === 'i' || e.key === 'I' || 
+                         e.key === 'c' || e.key === 'C' || 
+                         e.key === 'v' || e.key === 'V' ||
+                         e.key === 'p' || e.key === 'P')
+                    ) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+
+                setInterval(() => {
+                    const start = performance.now();
+                    debugger;
+                    const end = performance.now();
+                    if (end - start > 100) {
+                        document.body.style.opacity = '0';
+                        document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50vh;">ACESSO NEGADO</h1>';
+                    }
+                }, 1000);
+            })();
+
+            // ========== VARIÁVEIS GLOBAIS ==========
+            let audioContext = null;
+            let currentHour = new Date().getHours();
+
+            // ========== TERMINAL ANIMATION ==========
+            function initTerminal() {
+                const terminal = document.getElementById('terminalOverlay');
+                
+                // Fechar terminal após animação
+                setTimeout(() => {
+                    terminal.classList.add('hidden');
+                }, 4000);
+            }
+
+            function playHoverSound(freq = 440, type = 'sine') {
+                if (!audioContext || audioContext.state === 'closed') return;
+                
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = type;
+                oscillator.frequency.value = freq;
+                
+                gainNode.gain.value = 0.02;
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                
+                const now = audioContext.currentTime;
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                
+                oscillator.stop(now + 0.05);
+            }
+
+            // ========== SISTEMA DE CORES POR HORA ==========
+            function updateThemeByHour() {
+                const now = new Date();
+                currentHour = now.getHours();
+                const timeString = now.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZone: 'America/Sao_Paulo'
+                });
+                
+                document.getElementById('timeSystem').innerHTML = `BRA // ${timeString}`;
+                
+                let hue;
+                if (currentHour >= 0 && currentHour < 6) {
+                    hue = 200 + (currentHour * 5);
+                } else if (currentHour >= 6 && currentHour < 12) {
+                    hue = 140 + ((currentHour - 6) * 5);
+                } else if (currentHour >= 12 && currentHour < 18) {
+                    hue = 80 + ((currentHour - 12) * 5);
+                } else {
+                    hue = 260 + ((currentHour - 18) * 10);
+                }
+                
+                document.documentElement.style.setProperty('--dynamic-hue', hue);
+                document.documentElement.style.setProperty('--neon-blue', `hsl(${hue}, 100%, 50%)`);
+                document.documentElement.style.setProperty('--neon-pink', `hsl(${hue + 60}, 100%, 50%)`);
+                document.documentElement.style.setProperty('--neon-green', `hsl(${hue - 40}, 100%, 50%)`);
+                document.documentElement.style.setProperty('--neon-purple', `hsl(${hue + 30}, 100%, 50%)`);
+            }
+
+            // ========== CANVAS 3D ==========
+            const canvas = document.getElementById('canvas-bg');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            let particles3D = [];
+            
+            class Particle3D {
+                constructor() {
+                    this.reset();
+                }
+                
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.z = Math.random() * 1000;
+                    this.size = Math.random() * 3 + 1;
+                    this.speed = Math.random() * 2 + 0.5;
+                    this.hue = Math.random() * 60 + 180;
+                }
+                
+                update() {
+                    this.z -= this.speed;
+                    
+                    if (this.z <= 0) {
+                        this.reset();
+                        this.z = 1000;
+                    }
+                    
+                    const scale = 500 / this.z;
+                    this.screenX = (this.x - width/2) * scale + width/2;
+                    this.screenY = (this.y - height/2) * scale + height/2;
+                    this.screenSize = this.size * scale;
+                }
+                
+                draw() {
+                    if (this.screenX >= 0 && this.screenX <= width && 
+                        this.screenY >= 0 && this.screenY <= height &&
+                        this.screenSize > 0.1) {
+                        
+                        ctx.beginPath();
+                        ctx.arc(this.screenX, this.screenY, this.screenSize, 0, Math.PI * 2);
+                        
+                        const gradient = ctx.createRadialGradient(
+                            this.screenX, this.screenY, 0,
+                            this.screenX, this.screenY, this.screenSize * 2
+                        );
+                        gradient.addColorStop(0, `hsl(${this.hue}, 100%, 50%)`);
+                        gradient.addColorStop(1, 'rgba(0, 247, 255, 0)');
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = `hsl(${this.hue}, 100%, 50%)`;
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            function initCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                particles3D = [];
+                for (let i = 0; i < 100; i++) {
+                    particles3D.push(new Particle3D());
+                }
+            }
+            
+            function animateCanvas() {
+                if (!ctx) return;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                particles3D.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                
+                requestAnimationFrame(animateCanvas);
+            }
+
+            // ========== PARTÍCULAS HTML ==========
+            function createParticles() {
+                const container = document.getElementById('particles');
+                if (!container) return;
+                
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 4 + 1;
+                    const duration = Math.random() * 10 + 5;
+                    const delay = Math.random() * 5;
+                    const zDepth = Math.random() * 200 - 100;
+                    
+                    particle.style.setProperty('--z', zDepth);
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.animation = `particleFloat ${duration}s infinite`;
+                    particle.style.animationDelay = `${delay}s`;
+                    
+                    container.appendChild(particle);
+                }
+            }
+
+            // ========== PRÉDIOS ==========
+            function createBuildings() {
+                const layer = document.getElementById('buildingLayer');
+                if (!layer) return;
+                
+                const buildingCount = Math.floor(window.innerWidth / 30) + 10;
+                
+                for (let i = 0; i < buildingCount; i++) {
+                    const building = document.createElement('div');
+                    building.className = 'building';
+                    
+                    const height = Math.random() * 200 + 50;
+                    const zDepth = Math.random() * 60 - 30;
+                    
+                    building.style.height = `${height}px`;
+                    building.style.setProperty('--z-depth', zDepth);
+                    building.style.animationDelay = `${Math.random() * 2}s`;
+                    
+                    layer.appendChild(building);
+                }
+            }
+
+            // ========== OUTDOOR SPARKS ==========
+            function createSparks() {
+                const container = document.getElementById('sparks');
+                if (!container) return;
+                
+                setInterval(() => {
+                    for (let i = 0; i < 3; i++) {
+                        const spark = document.createElement('div');
+                        spark.className = 'spark';
+                        
+                        const tx = (Math.random() - 0.5) * 100;
+                        const ty = (Math.random() - 0.5) * 100;
+                        
+                        spark.style.setProperty('--tx', tx + 'px');
+                        spark.style.setProperty('--ty', ty + 'px');
+                        spark.style.left = '50%';
+                        spark.style.top = '50%';
+                        spark.style.animationDuration = Math.random() * 1 + 0.5 + 's';
+                        
+                        container.appendChild(spark);
+                        
+                        setTimeout(() => spark.remove(), 1500);
+                    }
+                }, 500);
+            }
+
+            // ========== EFEITO 3D NO CARD ==========
+            function init3DCard() {
+                const card = document.getElementById('mainCard');
+                if (!card) return;
+                
+                let mouseX = 0;
+                let mouseY = 0;
+                let currentX = 0;
+                let currentY = 0;
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (window.innerWidth <= 768) return;
+                    
+                    mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
+                    mouseY = (e.clientY / window.innerHeight - 0.5) * -15;
+                });
+                
+                function animateCard() {
+                    if (window.innerWidth <= 768) {
+                        card.style.transform = 'none';
+                        return;
+                    }
+                    
+                    currentX += (mouseX - currentX) * 0.05;
+                    currentY += (mouseY - currentY) * 0.05;
+                    
+                    card.style.transform = `rotateY(${currentX}deg) rotateX(${currentY}deg) translateZ(20px)`;
+                    
+                    requestAnimationFrame(animateCard);
+                }
+                
+                animateCard();
+            }
+
+            // ========== INTERAÇÕES DOS LINKS ==========
+            function initLinkInteractions() {
+                const links = document.querySelectorAll('.terminal-link');
+                
+                links.forEach(link => {
+                    link.addEventListener('mouseenter', () => {
+                        playHoverSound(600, 'triangle');
+                    });
+                    
+                    link.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        playHoverSound(600, 'triangle');
+                        
+                        link.style.transform = 'translateX(10px) scale(1.02) translateZ(20px)';
+                        link.style.borderColor = 'var(--neon-pink)';
+                        link.style.background = 'rgba(255, 0, 170, 0.1)';
+                    });
+                    
+                    link.addEventListener('touchend', () => {
+                        link.style.transform = '';
+                        link.style.borderColor = 'var(--neon-blue)';
+                        link.style.background = 'rgba(0, 247, 255, 0.03)';
+                    });
+                    
+                    link.addEventListener('click', (e) => {
+                        playHoverSound(900, 'square');
+                        
+                        link.style.transform = 'scale(0.98) translateZ(10px)';
+                        setTimeout(() => {
+                            link.style.transform = '';
+                        }, 100);
+                    });
+                });
+            }
+
+            // ========== RESIZE HANDLER ==========
+            function handleResize() {
+                initCanvas();
+                
+                const layer = document.getElementById('buildingLayer');
+                if (layer) {
+                    layer.innerHTML = '';
+                    createBuildings();
+                }
+            }
+
+            // ========== OTIMIZAÇÕES ==========
+            function optimizeForDevice() {
+                if (window.innerWidth <= 768) {
+                    document.querySelectorAll('.particle').forEach((el, index) => {
+                        if (index > 20) el.remove();
+                    });
+                    
+                    particles3D = particles3D.slice(0, 40);
+                }
+            }
+
+            // ========== INICIALIZAÇÃO ==========
+            function init() {
+                // Inicializar AudioContext para efeitos sonoros (após interação)
+                document.addEventListener('click', () => {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                }, { once: true });
+                
+                // Sistema de cores
+                updateThemeByHour();
+                setInterval(updateThemeByHour, 1000);
+                
+                // Elementos visuais
+                initCanvas();
+                createParticles();
+                createBuildings();
+                createSparks();
+                
+                // Interações
+                init3DCard();
+                initLinkInteractions();
+                
+                // Terminal animation
+                initTerminal();
+                
+                // Event listeners
+                window.addEventListener('resize', () => {
+                    setTimeout(handleResize, 100);
+                });
+                
+                // Otimizações
+                optimizeForDevice();
+                
+                // Iniciar animação
+                animateCanvas();
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
