@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes, shrink-to-fit=no">
    
-    <title>// ZNN // SYS://WATCHDOGS</title>
+    <title>Social Networks // Zainon</title>
    
     <meta name="theme-color" content="#0a1a2a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -166,6 +166,7 @@
             opacity: 0.3;
             mix-blend-mode: overlay;
             animation: scanMove 12s infinite linear;
+            will-change: transform;
         }
         html {
             font-size: 16px;
@@ -220,6 +221,7 @@
             animation: fadeIn 1s ease-out;
             transform: translateZ(0);
             margin: clamp(10px, 3vh, 30px) auto;
+            overflow: hidden;
         }
         .card::before {
             content: '';
@@ -230,25 +232,9 @@
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-orange), transparent);
             animation: scanMove 8s infinite;
+            opacity: 0.8;
         }
-        .card::after {
-            content: '⚡ ZNN ⚡';
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: #0a1a2a;
-            color: var(--neon-orange);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(11px, 2.5vw, 13px);
-            padding: 4px clamp(10px, 3vw, 20px);
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 15px var(--neon-cyan);
-            letter-spacing: 2px;
-            white-space: nowrap;
-            border-radius: 4px;
-            text-transform: uppercase;
-            z-index: 2;
-        }
+        /* Linha superior esquerda removida - card::after completamente eliminado */
         .glitch-name {
             font-family: 'Press Start 2P', cursive;
             font-size: clamp(22px, 8vw, 48px);
@@ -262,6 +248,7 @@
             animation: fadeIn 0.8s ease-out;
             line-height: 1.4;
             word-break: break-word;
+            letter-spacing: 2px;
         }
         .bio {
             color: var(--neon-cyan);
