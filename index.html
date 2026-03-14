@@ -234,7 +234,7 @@
             animation: scanMove 8s infinite;
             opacity: 0.8;
         }
-        /* Linha superior esquerda removida - card::after completamente eliminado */
+        /* Nome ZAINON ajustado - centralizado perfeitamente */
         .glitch-name {
             font-family: 'Press Start 2P', cursive;
             font-size: clamp(22px, 8vw, 48px);
@@ -246,9 +246,20 @@
                 4px 4px 0 var(--neon-blue),
                 6px 6px 0 var(--neon-orange);
             animation: fadeIn 0.8s ease-out;
-            line-height: 1.4;
-            word-break: break-word;
-            letter-spacing: 2px;
+            line-height: 1.2;
+            word-break: keep-all;
+            letter-spacing: normal;
+            white-space: nowrap;
+            width: 100%;
+            display: block;
+        }
+        /* Para telas muito pequenas, permite quebra */
+        @media (max-width: 400px) {
+            .glitch-name {
+                font-size: clamp(18px, 6vw, 28px);
+                white-space: normal;
+                word-break: break-word;
+            }
         }
         .bio {
             color: var(--neon-cyan);
@@ -287,7 +298,7 @@
         .terminal-link {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
             background: rgba(0, 10, 20, 0.6);
             border: 1px solid var(--neon-cyan);
@@ -321,11 +332,72 @@
             transition: left 0.5s;
             pointer-events: none;
         }
+        /* Ajuste para alinhar os nomes dos botões perfeitamente no centro */
+        .terminal-link span:nth-child(2) {
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+            min-width: 100px;
+        }
+        
+        .link-icon {
+            color: var(--neon-cyan);
+            font-size: clamp(18px, 4vw, 22px);
+            text-shadow: 0 0 10px currentColor;
+            transition: all 0.3s ease;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .link-stats {
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: var(--neon-blue);
+            opacity: 0.9;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 2px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            border-left: 2px solid var(--neon-orange);
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* Ajuste responsivo para os botões */
+        @media (max-width: 480px) {
+            .terminal-link span:nth-child(2) {
+                min-width: 80px;
+                margin: 0 5px;
+                font-size: 13px;
+            }
+            .link-icon {
+                min-width: 30px;
+            }
+            .link-stats {
+                min-width: 70px;
+                font-size: 10px;
+                padding: 2px 4px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .terminal-link span:nth-child(2) {
+                min-width: 60px;
+                font-size: 11px;
+            }
+            .link-stats {
+                min-width: 60px;
+                font-size: 9px;
+            }
+        }
+        
         .terminal-link:nth-child(1) { animation-delay: 0.1s; }
         .terminal-link:nth-child(2) { animation-delay: 0.2s; }
         .terminal-link:nth-child(3) { animation-delay: 0.3s; }
         .terminal-link:nth-child(4) { animation-delay: 0.4s; }
         .terminal-link:nth-child(5) { animation-delay: 0.5s; }
+        .terminal-link:nth-child(6) { animation-delay: 0.6s; }
+        
         @media (hover: hover) {
             .terminal-link:hover {
                 transform: translateX(8px);
@@ -343,28 +415,14 @@
                 transform: scale(1.2);
             }
         }
+        
         .terminal-link:active, .terminal-link.touch-active {
             transform: scale(0.98);
             background: rgba(0, 255, 255, 0.2);
             border-color: var(--neon-orange);
             box-shadow: 0 0 30px var(--neon-orange);
         }
-        .link-icon {
-            color: var(--neon-cyan);
-            font-size: clamp(18px, 4vw, 22px);
-            text-shadow: 0 0 10px currentColor;
-            transition: all 0.3s ease;
-        }
-        .link-stats {
-            font-size: clamp(10px, 2.5vw, 12px);
-            color: var(--neon-blue);
-            opacity: 0.9;
-            font-family: 'Share Tech Mono', monospace;
-            padding: 2px 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            border-left: 2px solid var(--neon-orange);
-        }
+        
         .copyright {
             margin-top: clamp(20px, 4vh, 30px);
             text-align: center;
@@ -376,11 +434,13 @@
             border-top: 1px solid rgba(0, 255, 255, 0.2);
             padding-top: clamp(12px, 3vh, 15px);
         }
+        
         .copyright .znn {
             color: var(--neon-orange);
             font-weight: bold;
             text-shadow: 0 0 10px currentColor;
         }
+        
         .security-watermark {
             position: fixed;
             bottom: max(10px, env(safe-area-inset-bottom));
@@ -397,10 +457,12 @@
             letter-spacing: 2px;
             white-space: nowrap;
         }
+        
         .card, .glitch-name, .bio, .terminal-link, .copyright {
             user-select: none;
             -webkit-user-select: none;
         }
+        
         img, .background-image {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -410,6 +472,7 @@
             user-select: none;
             pointer-events: none;
         }
+        
         @media (max-width: 768px) {
             .glitch-name {
                 text-shadow:
@@ -424,15 +487,17 @@
                 min-height: 48px;
             }
         }
+        
         @media (max-width: 480px) {
             .card {
                 padding: 18px;
             }
             .terminal-link {
-                padding: 12px 14px;
-                font-size: 14px;
+                padding: 10px 12px;
+                min-height: 44px;
             }
         }
+        
         @media (min-width: 768px) and (max-width: 1024px) {
             .card {
                 max-width: 80vw;
@@ -441,6 +506,7 @@
                 min-height: 55px;
             }
         }
+        
         @media (min-width: 1600px) {
             .card {
                 max-width: 700px;
@@ -456,6 +522,7 @@
                 min-height: 60px;
             }
         }
+        
         @media (orientation: landscape) and (max-height: 600px) {
             body {
                 align-items: flex-start;
@@ -478,8 +545,8 @@
                 margin: 12px 0;
             }
             .terminal-link {
-                padding: 8px 12px;
-                min-height: 42px;
+                padding: 8px 10px;
+                min-height: 38px;
             }
             .copyright {
                 margin-top: 12px;
@@ -535,6 +602,12 @@
                     <span class="link-icon">⌨️</span>
                     <span>TIKTOK</span>
                     <span class="link-stats">[TRENDING]</span>
+                </a>
+                
+                <a href="https://discord.gg/JFjYCeGySq" class="terminal-link" target="_blank" rel="noopener noreferrer">
+                    <span class="link-icon">⌨️</span>
+                    <span>DISCORD</span>
+                    <span class="link-stats">[JOIN]</span>
                 </a>
                
                 <a href="https://www.paypal.com/donate/?business=QCK5BKTRNPGNW" class="terminal-link" target="_blank" rel="noopener noreferrer">
